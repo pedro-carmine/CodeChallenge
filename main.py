@@ -16,6 +16,13 @@ def get_return_1d(data, tickers):
     for ticker in tickers:
         returns_1d.append(data[ticker]['Close'].pct_change()[::-1].head(1).values[0])
     return returns_1d
+
+def get_last_closes(data, tickers):
+    last_closes = []
+    data = data[::-1]
+    for ticker in tickers:
+        last_closes.append(data[ticker]['Close'].head(1).values[0])
+    return last_closes
     
 
 tickers = ["META", "AAPL", "MSFT", "TSLA", "AMZN", "SHEL", "NSRGY", "ROG.SW", "OR.PA", "AZN"]
@@ -24,8 +31,11 @@ try:
 except Exception as exception:
     print(f"An error occurred while fetching tickers: {exception}")
 
-returns_1d = get_return_1d(data, tickers)
-names = get_names(tickers)
-print(returns_1d)
-print(names)
-#print(data['AMZN']['Close'].pct_change(periods=1, freq='M'))
+# returns_1d = get_return_1d(data, tickers)
+# names = get_names(tickers)
+last_closes = get_last_closes(data, tickers)
+print(last_closes)
+# print(returns_1d)
+# print(names)
+# print(data['AMZN'])
+# print(data['AMZN']['Close'].pct_change(periods=1, freq='M'))
