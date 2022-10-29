@@ -1,12 +1,22 @@
 import yfinance as yf
 import pandas as pd
+import datetime
+from dateutil.relativedelta import relativedelta
+
+
+def get_names(tickers):
+    names = []
+    for ticker in tickers:
+        data = yf.Ticker(ticker)
+        names.append(data.info['longName'])
+    return names
 
 tickers = ["META", "AAPL", "MSFT", "TSLA", "AMZN", "SHEL", "NSRGY", "ROG.SW", "OR.PA", "AZN"]
 try:
-    tickers = (yf.Ticker(ticker) for ticker in tickers)
+    data = yf.download(tickers=tickers, end=datetime.datetime.now(), start=datetime.datetime.now() - relativedelta(months=1))
 except Exception as exception:
     print(f"An error occurred while fetching tickers: {exception}")
 
+data = data[::-1].head()
 
-for ticker in tickers:
-    print(ticker)
+names = get_names(tickers)
