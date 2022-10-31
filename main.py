@@ -11,7 +11,8 @@ def get_names(tickers):
         try:
             data = yf.Ticker(ticker)
         except Exception as exception:
-            print(f"An error occurred while fetching tickers: {exception}")
+            print("An error occurred while fetching tickers:")
+            raise exception
 
         names.append(data.info['longName'])
     return names
@@ -78,7 +79,8 @@ def get_prices(data, tickers):
 try:
     data = yf.download(tickers=tickers, period='1mo', group_by='ticker')
 except Exception as exception:
-    print(f"An error occurred while fetching tickers: {exception}")
+    print("An error occurred while fetching tickers:")
+    raise exception
 
 returns_1d = get_return_1d(data, tickers)
 returns_1w = get_return_1w(data, tickers)
