@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+import streamlit as st
 
 tickers = ["META", "AAPL", "MSFT", "TSLA", "AMZN", "SHEL", "NSRGY", "ROG.SW", "OR.PA", "AZN"]
 headers = ['Symbol', 'Name', 'Last Date', 'Last Close', 'Return 1D', 'Return 1W', 'Return 1M', 'Average 1M']
@@ -108,29 +109,38 @@ def country_statistics(mkcap: dict) -> dict:
     return statistics
 
 
+@st.experimental_memo
+def load_data(df_data, headers):
+    return pd.DataFrame(df_data, columns=headers).sort_values(by='Symbol')
+
+
 try:
     data = yf.download(tickers=tickers, period='1mo', group_by='ticker')
 except Exception as exception:
     print("An error occurred while fetching tickers:")
     raise exception
 
-# returns_1d = get_return_1d(data, tickers)
-# returns_1w = get_return_1w(data, tickers)
-# returns_1m = get_return_1m(data, tickers)
-# names = get_names(tickers)
-# last_close_dates = get_last_close_dates(data, tickers)
-# last_closes = get_last_closes(data, tickers)
-# average = get_month_avg(data, tickers)
-#
-# df_data = list(zip(tickers, names, last_close_dates, last_closes, returns_1d, returns_1w, returns_1m, average))
-# df = pd.DataFrame(df_data, columns=headers).sort_values(by='Symbol')
-# print(df.to_string(index=False))
+returns_1d = get_return_1d(data, tickers)
+returns_1w = get_return_1w(data, tickers)
+returns_1m = get_return_1m(data, tickers)
+names = get_names(tickers)
+last_close_dates = get_last_close_dates(data, tickers)
+last_closes = get_last_closes(data, tickers)
+average = get_month_avg(data, tickers)
+
+df_data = list(zip(tickers, names, last_close_dates, last_closes, returns_1d, returns_1w, returns_1m, average))
+df = load_data(df_data, headers)
+print(df.to_string(index=False))
 #
 # newdict = get_prices(data, tickers)
 # print(str(newdict))
 
-mkcap = get_marketcap(tickers)
-stats = country_statistics(mkcap)
+# mkcap = get_marketcap(tickers)
+# stats = country_statistics(mkcap)
+#
+# df2 = pd.DataFrame(stats)
+# print(df2.transpose())
 
-df2 = pd.DataFrame(stats)
-print(df2.transpose())
+st.header("Dystematic Dashboard")
+st.subheader("Companies")
+st.dataframe(df, use_container_width=True)
