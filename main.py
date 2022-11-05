@@ -1,3 +1,8 @@
+#######################################
+# Dystematic Code Challenge           |
+# Pedro Carmine                       |
+#######################################
+
 import yfinance as yf
 import pandas as pd
 import streamlit as st
@@ -7,6 +12,14 @@ headers = ['Symbol', 'Name', 'Last Date', 'Last Close', 'Return 1D', 'Return 1W'
 
 
 def get_names(tickers) -> list:
+    """Gets the name of the tickers specified in the tickers list.
+
+    Args:
+        tickers: List of the strings of the tickers to be fetched.
+
+    Returns:
+        List with the names of each ticker.
+    """
     names = []
     for ticker in tickers:
         try:
@@ -20,6 +33,15 @@ def get_names(tickers) -> list:
 
 
 def get_last_close_dates(data, tickers) -> list:
+    """Gets the last close date for each ticker from the yfinance API.
+
+    Args:
+        data: Dataframe with downloaded information of the tickers.
+        tickers: List of the strings of the tickers to be fetched.
+
+    Returns:
+        List with last close dates for each ticker.
+    """
     last_close_dates = []
     for ticker in tickers:
         last_close_dates.append(data[ticker].index.to_pydatetime()[-1].strftime("%Y-%m-%d"))
@@ -27,6 +49,15 @@ def get_last_close_dates(data, tickers) -> list:
 
 
 def get_return_1d(data, tickers) -> list:
+    """Gets the value of the return in one day for each ticker.
+
+    Args:
+        data: Dataframe with downloaded information of the tickers.
+        tickers: List of the strings of the tickers to be fetched.
+
+    Returns:
+        List with the value of the one-day return for each ticker.
+    """
     returns_1d = []
     for ticker in tickers:
         returns_1d.append("%0.2f" % data[ticker]['Close'].pct_change()[::-1].head(1).values[0])
@@ -34,6 +65,15 @@ def get_return_1d(data, tickers) -> list:
 
 
 def get_return_1w(data, tickers) -> list:
+    """Gets the value of the return in one week for each ticker.
+
+    Args:
+        data: Dataframe with downloaded information of the tickers.
+        tickers: List of the strings of the tickers to be fetched.
+
+    Returns:
+        List with the value of the one-week return for each ticker.
+    """
     returns_1w = []
     for ticker in tickers:
         returns_1w.append(data[ticker]['Close'].pct_change(periods=5).values[-1])
@@ -41,6 +81,15 @@ def get_return_1w(data, tickers) -> list:
 
 
 def get_return_1m(data, tickers) -> list:
+    """Gets the value of the return in one month for each ticker.
+
+    Args:
+        data: Dataframe with downloaded information of the tickers.
+        tickers: List of the strings of the tickers to be fetched.
+
+    Returns:
+        List with the value of the one-month return for each ticker.
+    """
     returns_1m = []
     for ticker in tickers:
         returns_1m.append(data[ticker]['Close'].pct_change(periods=21, fill_method="bfill").values[-1])
@@ -48,6 +97,16 @@ def get_return_1m(data, tickers) -> list:
 
 
 def get_month_avg(data, tickers) -> list:
+    """Sums up all the values and calculate the average value in the month of each ticker.
+        This function can probably be improved to calculate the average using numpy.
+
+    Args:
+        data: Dataframe with downloaded information of the tickers.
+        tickers: List of the strings of the tickers to be fetched.
+
+    Returns:
+        List with the month average value of each ticker.
+    """
     avg = []
     for ticker in tickers:
         rows = data[ticker]['Close']
@@ -56,10 +115,19 @@ def get_month_avg(data, tickers) -> list:
 
 
 def get_last_closes(data, tickers) -> list:
+    """Gets the value of the last close of each ticker.
+
+    Args:
+        data: Dataframe with downloaded information of the tickers.
+        tickers: List of the strings of the tickers to be fetched.
+
+    Returns:
+        List with the value of the last close of each ticker.
+    """
     last_closes = []
-    data = data[::-1]
+    data = data[::-1]  # inverts the list so the first value is the most recent one.
     for ticker in tickers:
-        last_closes.append(data[ticker]['Close'].head(1).values[0])
+        last_closes.append(data[ticker]['Close'].head(1).values[0])  # adds the last close value to the list
     return last_closes
 
 
@@ -130,14 +198,14 @@ average = get_month_avg(data, tickers)
 
 df_data = list(zip(tickers, names, last_close_dates, last_closes, returns_1d, returns_1w, returns_1m, average))
 df = load_data(df_data, headers)
-print(df.to_string(index=False))
-#
+
+
 # newdict = get_prices(data, tickers)
 # print(str(newdict))
 
 # mkcap = get_marketcap(tickers)
 # stats = country_statistics(mkcap)
-#
+
 # df2 = pd.DataFrame(stats)
 # print(df2.transpose())
 
