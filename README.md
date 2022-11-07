@@ -25,5 +25,5 @@ pip install -r requirements.txt
 
 ### Running the code
 ```bash
-python main.py
+streamlit run main.py
 ```
