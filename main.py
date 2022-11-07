@@ -48,6 +48,7 @@ def get_last_close_dates(data, tickers) -> list:
     return last_close_dates
 
 
+@st.cache
 def get_return_1d(data, tickers) -> list:
     """Gets the value of the return in one day for each ticker.
 
@@ -64,6 +65,7 @@ def get_return_1d(data, tickers) -> list:
     return returns_1d
 
 
+@st.cache
 def get_return_1w(data, tickers) -> list:
     """Gets the value of the return in one week for each ticker.
 
@@ -80,6 +82,7 @@ def get_return_1w(data, tickers) -> list:
     return returns_1w
 
 
+@st.cache
 def get_return_1m(data, tickers) -> list:
     """Gets the value of the return in one month for each ticker.
 
@@ -96,6 +99,7 @@ def get_return_1m(data, tickers) -> list:
     return returns_1m
 
 
+@st.cache
 def get_month_avg(data, tickers) -> list:
     """Sums up all the values and calculate the average value in the month of each ticker.
         This function can probably be improved to calculate the average using numpy.
@@ -131,10 +135,15 @@ def get_last_closes(data, tickers) -> list:
     return last_closes
 
 
-def create_ts(data, tickers):
+def create_ts(tickers):
     ts = {}
+    columns_to_be_dropped = ['Open', 'High', 'Low', 'Adj Close', 'Volume']
     for ticker in tickers:
-        pass
+        data = yf.download(tickers=ticker, period='1y')
+        data = data.drop(columns=columns_to_be_dropped)
+        data['Return 1M'] = data['Close'].pct_change(periods=21, fill_method='bfill')
+        ts[ticker] = data
+    return ts
 
 
 def get_marketcap(tickers) -> dict:
@@ -177,7 +186,16 @@ def country_statistics(mkcap: dict) -> dict:
     return statistics
 
 
-@st.experimental_memo
+def chart(ticker, ts):
+    if ticker in tickers:
+        st.line_chart(ts[ticker.upper()]['Close'], use_container_width=True)
+    elif ticker == '':
+        st.warning("Please insert a ticker")
+    else:
+        st.error("Invalid ticker name")
+
+
+@st.cache
 def load_data(df_data, headers):
     return pd.DataFrame(df_data, columns=headers).sort_values(by='Symbol')
 
@@ -199,7 +217,6 @@ average = get_month_avg(data, tickers)
 df_data = list(zip(tickers, names, last_close_dates, last_closes, returns_1d, returns_1w, returns_1m, average))
 df = load_data(df_data, headers)
 
-
 # newdict = get_prices(data, tickers)
 # print(str(newdict))
 
@@ -212,3 +229,9 @@ df = load_data(df_data, headers)
 st.header("Dystematic Dashboard")
 st.subheader("Companies")
 st.dataframe(df, use_container_width=True)
+
+ts = create_ts(tickers)
+
+selected = st.text_input(label="Insert ticker")
+st.subheader("Prices")
+chart(selected, ts)
