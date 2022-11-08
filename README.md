@@ -31,3 +31,15 @@ pip install -r requirements.txt
 ```bash
 streamlit run main.py
 ```
+
+### Overall notes
+- What could have been improved?
+1. Operations/calculations using numpy to improve code performance/readability.
+2. Better usage of Pandas library.
+3. Reduce the amount of times that the yfinance API is fetched.
+4. Improve code for a production environment, since there is no previous experience in this field.
+5. Code organization/structure.
+
+- Commentary
+
+Doing this challenge showed me how much can be done using Python libraries that I have not used before with just a few lines of code. It was extremely fun and challenging at the same to work with libraries that I had to learn from zero (and learned just the tip of the iceberg) and see how things worked together in the end to produce a dashboard.
